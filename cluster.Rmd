@@ -1,0 +1,88 @@
+---
+title: "clusters"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+library(tidyr)
+library(dplyr)
+library(magrittr)
+library(ggplot2)
+library(dendextend)
+library(RColorBrewer)
+
+
+# read data from causton heat expression data set
+# see groups 4 and 9 data/focal papers
+causton <- read.csv("causton.csv")
+
+
+# Take a look at data. You'll see that the genes are in rows, 
+# and the time points and gene names are in columns
+head(causton)
+
+# Reshape data by
+causton.long <- 
+  causton %>%
+  gather(time, expression, -ORF, -Gene) %>%
+  arrange(ORF)  # sort by ORF
+
+# look at the data after reshaping
+head(causton.long)
+
+# Calculate the variance by gene
+causton.var <-
+  causton.long %>%
+  group_by(ORF) %>%
+  summarize(var = var(expression, na.rm = TRUE))
+
+# Find the ORFs with non-zero variance
+non.zero.var.ORFs <-
+  causton.var %>%
+  filter(var != 0) %$%  # NOTE use of %$% operator from magrittr pkg
+  ORF
+
+# only keep genes with non-zero variance
+causton.trim <-
+  causton.long %>%
+  filter(ORF %in% non.zero.var.ORFs) 
+
+# spread to "wide" format appropriate for calculating correlations, with
+# genes in columns, time points in row, after dropping Gene name column
+causton.wide <-
+  causton.trim %>%
+  select(-Gene) %>%  # drop the Gene name column
+  spread(ORF, expression)
+
+# calculating correlations
+causton.cor <- 
+  causton.wide %>%
+  select(-time) %>%  # drop the time column before calculating correlations
+  cor(use = "pairwise.complete.obs")
+
+#dendrograms
+causton.dist <- as.dist(1-causton.cor)
+causton.tree <- hclust(causton.dist, method="complete")
+plot(causton.tree)
+causton.dend <- as.dendrogram(causton.tree)
+clusters <-cutree(causton.dend, k=10, order_clusters_as_data = FALSE)
+clusters.df <- data.frame(gene=names(clusters), cluster=clusters)
+cluster6.genes <- filter(clusters.df, cluster==6)$gene
+
+color.scheme <- rev(brewer.pal(8,"RdBu"))
+
+causton.long %>%
+  filter(ORF %in% cluster6.genes) %>%
+  ggplot(aes(x=time, y=ORF, fill=log(expression))) +
+  geom_tile() +
+  scale_fill_gradientn(colors=color.scheme) +
+  theme(axis.text.y=element_text(size=6))

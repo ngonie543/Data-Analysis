@@ -1,0 +1,95 @@
+---
+title: "zantonHomework"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+zanton<-read.csv("/Users/Ngonie/Downloads/zanton-2004-TFbinding.csv")
+zanton<-zanton[c(1:6226),]
+TBP<-zanton[,5]
+TBP <- TBP[!is.na(TBP)]
+diffTBP <- abs(zanton[,5] - zanton[,4])
+length(diffBDF1)
+length(which (diffBDF1>0.001))
+#length(which(TBP>0))
+
+```
+
+
+
+
+```{r}
+
+TAF1<-zanton[,6]
+TAF1 <- TAF1[!is.na(TAF1)]
+diffTAF1 <- abs(zanton[,6] - zanton[,4])
+length(which (diffTAF1>0.001))
+#length(which(TAF1>0))
+```
+
+
+
+```{r}
+BDF1<-zanton[,7]
+BDF1 <- BDF1[!is.na(BDF1)]
+diffBDF1 <- abs(zanton[,7] - zanton[,4])
+length(diffBDF1)
+length(which (diffBDF1>0.001))
+#length(which(BDF1>0))
+
+```
+
+
+
+
+```{r}
+SPT3<-zanton[,8]
+SPT3 <- SPT3[!is.na(SPT3)]
+diffSPT3 <- abs(zanton[,8] - zanton[,4])
+length(diffSPT3)
+length(which (diff>0.001))
+#length(which(SPT3>0))
+
+
+```
+
+
+
+```{r}
+MOT1<-zanton[,8]
+MOT1 <- MOT1[!is.na(MOT1)]
+diffMOT1 <- abs(zanton[,8] - zanton[,4])
+length(diffMOT1)
+length(which (diffMOT1>0.001))
+#length(which(MOT1>0))
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
